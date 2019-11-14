@@ -1,3 +1,15 @@
-each article in articles
-  div(style="border: 2px solid black")
-    p= article.title
+html(lang="en")
+  head
+    style(type='text/css').
+      .button{
+        wid: 100px;
+        height: 10px;
+      }
+  - var value = 0
+  body
+    each article in articles
+      - value= value + 1
+      div(style="border: 2px solid black" class=value)
+        p= article.title
+        button(class=) publish
+    script(src="/javascripts/publishArticle.js")

@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 
 const articleSchema = Schema({ 
     title: String,
+    isPublished: {type: Boolean, default: false}
   }); 
 
 // there write methods

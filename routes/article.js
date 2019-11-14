@@ -6,15 +6,17 @@ const articleModel = require('../models/articles.js');
 
 /* GET users listing. */
 
-articleModel.find({isPublished:true}, function(req, data){
-    console.log(data.length);
-    // console.log(data[0]);
-    for(let num = 0; num< data.length; num++){
-      router.get(`/${data[num].id}`, function(req,res){
-        res.render("title: " + data.title);
-      });
-    }
-  
-  });
 
+      router.get('/:id', function(req,res){
+        articleModel.findOne({_id:req.params.id})
+        .then((data)=>{
+            res.render('title', {content: data});
+
+        })
+        .catch((err)=>{
+            if(err) throw err;
+        });
+    });
+    
 module.exports = router;
+    
