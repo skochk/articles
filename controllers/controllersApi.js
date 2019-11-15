@@ -10,7 +10,7 @@ module.exports.register = async (login, password) => {
     users.password = cryptedpwd;
     // console.log(password_value.hashingpwd());
     const data = await users.save();    
-    return data;
+    return data._id;
   } catch(err){
     if (err) throw err;
   };

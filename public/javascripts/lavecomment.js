@@ -1,14 +1,13 @@
 
 document.querySelector('form').addEventListener('submit', function(e){
-    // function sendComment(articleID, comment){
-        let str = window.location.pathname;
-            let articleID = str.split('/articles/')[1];
-            let comment = document.querySelector('input').value;
-            
-            // console.log('id: ' + articleID);
-            // console.log("comment: " + comment);
-            let data = {articleID:articleID,text:comment};
-       
+    let str = window.location.pathname;
+    let articleID = str.split('/articles/')[1];
+    let comment = document.querySelector('input').value;
+    
+    // console.log('id: ' + articleID);
+    // console.log("comment: " + comment);
+    let data = {articleID:articleID,text:comment};
+
         fetch('/apiAddComment', 
                 {
                     method: 'POST',

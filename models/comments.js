@@ -7,6 +7,7 @@ const commentSchema = Schema({
     reffersToID: String,
     userID: String,
     articleID: String,
+    
 
   }); 
 
