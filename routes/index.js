@@ -1,19 +1,26 @@
 var express = require('express');
 var router = express.Router();
 var http = require('http');
+const cookieParser = require('cookie-parser');
+
 
 var mongoose = require('mongoose');
 
-const usersModel = require('../models/users.js');
 const articleModel = require('../models/articles.js');
 const commentModel = require('../models/comments.js');
+
+
+const UsersModel = require('../models/loginData.js');
+const mainController = require('../controllers/controllersApi');
+const Ajv = require('ajv');
+const ajv = new Ajv();
+const userSchema = require('../schemas/mainSchema');
 
 // app.use(bodyParser.json());
 
 
 /* GET home page. */
 router.get('/', function(req, res, next) {
-
   articleModel.find({isPublished:true}) /* */
   .then(data=>{
     res.render('index', {publishedTitles: data});
@@ -22,6 +29,31 @@ router.get('/', function(req, res, next) {
 });
 
 
+router.post('/register', (req, res) => {
+  (async function () {
+    const validate = ajv.compile(userSchema);
+    const valid = validate(req.body);
+    if(!valid){
+      const { errors } = validate;
+      res.send('invalid data');
+    }
+    else{
+      (async function(){
+
+      await mainController.register(req.body.login, req.body.pwd);
+      //add cookies to get access on /userpanel
+      await UsersModel.findOne({login:req.body.login})
+      .then((data)=>{
+        // console.log(data);
+        res.cookie('userID', data._id); 
+        res.redirect('/userpanel');
+      })
+      .catch((err)=>{if (err) throw err});
+      
+    })();
+    }
+  }());
+});
 
 
 router.post('/apiAddComment', function(req,res){
@@ -47,47 +79,64 @@ router.get('/apiGetComments', function(req,res){
   .catch(err=>{if(err) throw err}); 
 });
 
-router.post('/login', function(req,res, next){
-  // const users = new usersModel({
-  //   login: req.body.login,
-  //   password: req.body.pwd,
+router.post('/login', (req, res) => {
+  const CurrentUser = {
+    login: req.body.login,
+    password: req.body.pwd,
+  };
 
-  // }); 
-  usersModel.findOne({login: req.body.login})
-  .then((data)=>{
-    if(data.password == req.body.pwd){
-      if(data.isAdmin == true){
-        res.redirect('/adminpanel');
+  UsersModel.findOne({ login: CurrentUser.login })
+    .then((data) => {
+      if (data.comparepwd(req.body.pwd)) {
+        if(data.isAdmin == true){
+          console.log(data._id);
+          res.cookie('userID', data._id);
+          res.redirect('/adminpanel');
+        } else {
+          console.log(data._id);
+          res.cookie('userID', data._id);
+          res.redirect('/userpanel');
+        }
+      }else{
+        res.send('wrong data');
       }
-      else{
-        res.redirect('/userpanel')
-      }
-    }
-    else{
-      res.send('wrong data');
-    }
-  })
-  .catch((err) => { if (err) throw err; });
-  // res.redirect('/gg');
+    })
+    .catch((err) => { if (err) throw err; });
 });
 
 
 
-
 router.get('/adminpanel', function(req,res){
-  articleModel.find({isPublished:false}) /* */
+  UsersModel.findOne({isAdmin:true})
+  .then((data1)=>{
+    // console.log('current cookies: '+ req.cookies.userID);
+    // console.log(data1);
 
-  .then(data=>{
-    // console.log(data);
-    res.render('adminIndex', {articles: data});
+    if(data1.id == req.cookies.userID){
+      articleModel.find({isPublished:false}) /* */
+      .then(data=>{
+        // console.log(data);
+        res.render('adminIndex', {articles: data});
+      })
+      .catch(err=>{if(err) throw err});
+    }
+    else{
+      res.send("sorry, you have not permission(cookies)");
+    }
+
   })
-  .catch(err=>{if(err) throw err});
-})
+  .catch((err)=>{if(err) throw err});
 
+});
 
 
 router.get("/userpanel", function(req,res){
-  res.render('userIndex.jade');
+  if(req.cookies.userID == null){
+    res.send("you have to register firstly");
+  }
+  else{
+    res.render('userIndex.jade');
+  }
 });
 
 router.post('/userAddArticle', function(req,res){
@@ -106,4 +155,28 @@ router.post('/apiPublishArticle', function(req,res){
 })
 
       
+
+// router.post('/login', function(req,res, next){
+
+//   usersModel.findOne({login: req.body.login})
+//   .then((data)=>{
+//     if(data.pwd == req.body.pwd){
+//       if(data.isAdmin == true){
+//         res.redirect('/adminpanel');
+//       }
+//       else{
+//         res.redirect('/userpanel')
+//       }
+//     }
+//     else{
+//       res.send('wrong data');
+//     }
+//   })
+//   .catch((err) => { if (err) throw err; });
+ 
+// });
+
 module.exports = router;
+
+
+
