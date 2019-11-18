@@ -20,8 +20,8 @@ const userSchema = require('../schemas/mainSchema');
 
 
 /* GET home page. */
-router.get('/', function(req, res, next) {
-  articleModel.find({isPublished:true}) /* */
+router.get('/', async function(req, res, next) {
+ await articleModel.find({isPublished:true}) /* */  
   .then(data=>{
     res.render('index', {publishedTitles: data});
   })
@@ -42,15 +42,6 @@ router.post('/register', (req, res) => {
       let newCokie = await mainController.register(req.body.login, req.body.pwd);
       res.cookie('userID', newCokie); 
       res.redirect('/userpanel');
-
-      //add cookies to get access on /userpanel
-      // await UsersModel.findOne({login:req.body.login})
-      // .then((data)=>{
-      //   // console.log(data);
-      //   res.cookie('userID', data._id); 
-      //   res.redirect('/userpanel');
-      // })
-      // .catch((err)=>{if (err) throw err});
       
     })();
     }
@@ -59,7 +50,6 @@ router.post('/register', (req, res) => {
 
 
 router.post('/apiAddComment', function(req,res){
-  // console.log(req.body);
 
   const newComment = new commentModel({
     text: req.body.text,
@@ -73,10 +63,8 @@ router.get('/apiGetComments', function(req,res){
   let str = req.headers.referer;
   let articleID = str.split('http://localhost:3000/articles/')[1];
 
-  // console.log();
   commentModel.find({articleID:articleID})
   .then((data)=>{
-    // console.log(data);
     res.send(data);
   })
   .catch(err=>{if(err) throw err}); 
@@ -163,10 +151,35 @@ router.post('/apiAddLike', function(req,res){
     articleID:req.body.articleID,
     userID:req.body.userID,
   });
-  console.log(req.body.userID);
-  
-  console.log(req.body.articleID);
-  newLike.save();
+  likesModel.findOne({articleID:req.body.articleID, userID:req.body.userID})
+  .then((data)=>{
+    console.log(data);
+    if(data){
+      console.log(req.body.articleID)
+      // likesModel.findOneAndRemove({articleID:req.body.articleID, userID:req.body.userID}, function(err, data){
+      //   console.log(err, data)
+      // });
+      likesModel.findOneAndRemove({articleID:req.body.articleID, userID:req.body.userID}).exec();
+    }
+    else{
+      console.log('like addded');
+      newLike.save();
+
+    }
+  })
+  // console.log(req.body.userID);
+  // console.log(req.body.articleID);
+  // newLike.save();
+});
+
+router.get('/apiGetLikes', function(req,res){
+  let str = req.headers.referer;
+  let articleID = str.split('http://localhost:3000/articles/')[1];
+  likesModel.find({articleID:articleID})
+  .then((data)=>{
+    res.send(data);
+  })
+  .catch(err=>{if(err) throw err}); 
 });
 
 module.exports = router;
