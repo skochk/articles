@@ -156,9 +156,6 @@ router.post('/apiAddLike', function(req,res){
     console.log(data);
     if(data){
       console.log(req.body.articleID)
-      // likesModel.findOneAndRemove({articleID:req.body.articleID, userID:req.body.userID}, function(err, data){
-      //   console.log(err, data)
-      // });
       likesModel.findOneAndRemove({articleID:req.body.articleID, userID:req.body.userID}).exec();
     }
     else{
@@ -167,9 +164,7 @@ router.post('/apiAddLike', function(req,res){
 
     }
   })
-  // console.log(req.body.userID);
-  // console.log(req.body.articleID);
-  // newLike.save();
+
 });
 
 router.get('/apiGetLikes', function(req,res){
@@ -181,6 +176,7 @@ router.get('/apiGetLikes', function(req,res){
   })
   .catch(err=>{if(err) throw err}); 
 });
+
 
 module.exports = router;
 
