@@ -13,13 +13,24 @@ p Content:
     each comment in comments
       div(style="border: 1px solid black")
         p=comment.text
-        p posted by: 
-          p=comment.userID
-        p answer on this comment
+        p(style="font-size: 0.8em")= `posted by ID: ${comment.userID}`
+        p(style="font-size: 0.8em") answer on this comment:
         form(action='/api/answerOnComment' method='POST')
           input(type="hidden" value=`${comment._id}` name="commentID")
           input(type='text', placeholder='write comment here' name='text')
           input(type="submit" value='send')
+        .answer_on_answer(style='margin-left: 50px; background-color: gray')
+          p answers on answer answer:
+          each answer in comment.answers
+            div(style="border: 1px solid #EE82EE")
+              p=answer.text
+              p(style="font-size: 0.8em")= `posted by ID: ${answer.userID}`
+              form(action='/api/answerOnComment' method='POST')
+                input(type="hidden" value=`${answer._id}` name="commentID")
+                input(type='text', placeholder='write comment here' name='text')
+                input(type="submit" value='send')
+
+
 
 
 

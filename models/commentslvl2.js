@@ -4,14 +4,13 @@ const Schema = mongoose.Schema;
 
 const commentSchema = Schema({ 
     text: String,
-    reffersToID: {type: 'String', default: null}, //reffers to id comment
+    reffersToID: {type: 'String', default: null}, //reffers to id comment first lvl
     userID: String,
     articleID: String,
-    answers: [{type: Schema.Types.ObjectId, ref:'commentslvl2'}],
-
-
+    date: {type: Date, default: Date.now},
+    
   }); 
-
+  
 // there write methods
-const comments = mongoose.model('comment', commentSchema);
+const comments = mongoose.model('commentslvl2', commentSchema);
 module.exports = comments;
