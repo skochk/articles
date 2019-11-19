@@ -11,10 +11,15 @@ const commentLvl2Model = require('../models/commentslvl2.js');
       router.get('/:id', (async function(req,res){
         let content = await articleModel.findOne({_id:req.params.id});
         let comments = await commentModel.find({articleID:req.params.id})
-        .populate('answers')
-        .then((data)=>{
-            res.render('title', {content:content, comments: data});
-            // res.send(data);
+        .populate({
+            path:'answers',
+            populate: {
+                path:'answersAnswers'
+            }
+        })
+            .then((data)=>{
+                res.render('title', {content:content, comments: data});
+                // res.send(data);
         })
         .catch((err)=>{if(err) throw err});
         

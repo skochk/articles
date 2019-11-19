@@ -8,32 +8,38 @@ p Content:
     .likes 0
     button(class='addLike') like
 
-  p commentaries:
+  h1 commentaries:
   div(class='commentArea')
     each comment in comments
-      div(style="border: 1px solid black")
+      div(style="border: 1px solid black; background-color: e6e6e6")
         p=comment.text
-        p(style="font-size: 0.8em")= `posted by ID: ${comment.userID}`
-        p(style="font-size: 0.8em") answer on this comment:
+        p(style="font-size: 0.8em; color: red")= `posted by ID: ${comment.userID}`
+        p(style="font-size: 0.8em;") answer on this comment:
         form(action='/api/answerOnComment' method='POST')
           input(type="hidden" value=`${comment._id}` name="commentID")
           input(type='text', placeholder='write comment here' name='text')
           input(type="submit" value='send')
-        .answer_on_answer(style='margin-left: 50px; background-color: gray')
+        
+        .answer_on_answer(style='margin-left: 50px; background-color: d1d1d1')
           p answers on answer answer:
           each answer in comment.answers
-            div(style="border: 1px solid #EE82EE")
+            div(style="border: 1px solid #c7c7c7")
               p=answer.text
-              p(style="font-size: 0.8em")= `posted by ID: ${answer.userID}`
-              form(action='/api/answerOnComment' method='POST')
+              p(style="font-size: 0.8em; color: red")= `posted by ID: ${answer.userID}`
+              form(action='/api/answerOnCommentLast' method='POST')
                 input(type="hidden" value=`${answer._id}` name="commentID")
                 input(type='text', placeholder='write comment here' name='text')
                 input(type="submit" value='send')
-
-
-
-
-
+                 
+            each answersAnswer in answer.answersAnswers
+              div(style="border: 1px solid #9e9e9e")
+                p=`${answer.userID},   ${answersAnswer.text}`
+                p(style="font-size: 0.8em; color: red")= `posted by ID: ${answersAnswer.userID}`
+                form(action='/api/answerOnCommentLast' method='POST')
+                  input(type="hidden" value=`${answersAnswer._id}` name="commentID")
+                  input(type='text', placeholder='write comment here' name='text')
+                  input(type="submit" value='send')
+              
   script(src="/javascripts/lavecomment.js")
   //- script(src="/javascripts/loadComments.js")
   script(src="/javascripts/addLike.js")

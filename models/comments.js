@@ -8,7 +8,7 @@ const commentSchema = Schema({
     userID: String,
     articleID: String,
     answers: [{type: Schema.Types.ObjectId, ref:'commentslvl2'}],
-
+    level: Number,
 
   }); 
 

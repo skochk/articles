@@ -22,24 +22,38 @@ router.post('/answerOnComment', function(req,res){
     userID: req.cookies.userID,
     articleID: articleID,
   });
-  // console.log(req.body);
 
   let newComment2lvl_ID;
   newComment2lvl.save()
     .then((data)=>{
       newComment2lvl_ID = newComment2lvl._id;
-      // console.log("id of new comment2lvl: " + newComment2lvl_ID);
-      //getting access on main comments
-      //adding record to 'answers'
       commentModel.findByIdAndUpdate(req.body.commentID, {$push: {answers:newComment2lvl_ID}})
       .then((data)=>{
-        // console.log(data);
-        // console.log('post id of lvl1 comm: ' + req.body.commentID);
-        
       })
-
-
     });
 
-})
+});
+
+
+router.post('/answerOnCommentLast', (async function(req,res){
+  let str = req.headers.referer;
+  let articleID = str.split('http://localhost:3000/articles/')[1];
+  const newComment2lvl = new commentLvl2Model({
+    text: req.body.text,
+    reffersToID: req.body.commentID,
+    userID: req.cookies.userID,
+    articleID: articleID,
+  });
+
+  let lastlvl;
+  await newComment2lvl.save()
+    .then((data)=>{
+      lastlvl = newComment2lvl._id;
+    });
+
+  await  commentLvl2Model.findByIdAndUpdate(req.body.commentID, {$push: {answersAnswers:lastlvl}})
+      .then((data)=>{
+        console.log(data);
+      });
+}));
 module.exports = router;

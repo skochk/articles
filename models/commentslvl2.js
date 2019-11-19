@@ -4,11 +4,11 @@ const Schema = mongoose.Schema;
 
 const commentSchema = Schema({ 
     text: String,
-    reffersToID: {type: 'String', default: null}, //reffers to id comment first lvl
+    reffersToID: String, //reffers to id comment first lvl
     userID: String,
     articleID: String,
     date: {type: Date, default: Date.now},
-    
+    answersAnswers:[{type: Schema.Types.ObjectId, ref:'commentslvl2'}],
   }); 
   
 // there write methods
